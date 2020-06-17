@@ -2,12 +2,16 @@ cmake_minimum_required(VERSION 3.10)
 
 project(NetworkWorld)
 
+
 set(CMAKE_CXX_STANDARD 17)
 
+# 이게 없으면 Xcode Archive 시 링크 에러가 난다.
+# https://stackoverflow.com/questions/30318941/cmake-generated-xcode-project-release-build-works-but-archive-fails-on-linker
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/out/library )
+
+add_subdirectory(glad)
 add_subdirectory(SDL2)
 add_subdirectory(lua)
-
-add_library(glad "glad/src/glad.c")
 
 include_directories("glad/include")
 include_directories("SDL2/include")
@@ -35,6 +39,8 @@ add_executable(NetworkWorld
 )
 
 #set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
+
+#find_library(GLAD_LIBRARY glad PATHS ${CMAKE_SOURCE_DIR}/glad)
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
     ${OPENGL_gl_LIBRARY}
@@ -73,3 +79,5 @@ add_custom_target(copy_lua DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/mood.lua")
 add_custom_target(copy_inspect DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/inspect.lua")
 
 add_dependencies(NetworkWorld copy_fonts copy_lua copy_inspect)
+
+SET_TARGET_PROPERTIES(NetworkWorld PROPERTIES MACOSX_BUNDLE TRUE)
